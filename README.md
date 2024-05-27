@@ -1,88 +1,75 @@
 # semana6-atividade-programacao
 
-# Reconhecimento de Objetos em Imagens
-
-## Descrição do Projeto
-
-Este projeto implementa um modelo de reconhecimento de objetos em imagens utilizando PyTorch. O modelo foi treinado utilizando a arquitetura ResNet-18 pré-treinada e ajustada para classificar imagens de formigas e abelhas. Uma API em Flask foi criada para receber imagens e retornar a categoria inferida pelo modelo.
-
-## Como Executar
-
-### Requisitos
-
-- Python 3.7+
-- Flask
-- PyTorch
-- Torchvision
-- PIL
-- Requests
-
-### Passos
-
-### Uso da API
-Para usar a API, envie uma solicitação POST para o endpoint /predict com uma imagem. Aqui está um exemplo utilizando curl:
-
-curl -X POST -F "file=@caminho/para/sua/imagem.jpg" http://127.0.0.1:5000/predict
 
 
+# Semana 6 - Atividade de Programação
 
-Claro, aqui está o conteúdo do relatório em Markdown (README.md) que descreve o projeto, explica como executá-lo e apresenta os resultados dos testes:
+Este projeto envolve a criação e treinamento de um modelo de rede neural convolucional (CNN) para classificação de imagens usando o conjunto de dados CIFAR-10. A implementação foi feita em Python usando TensorFlow e Keras.
 
-markdown
-Copy code
-# Reconhecimento de Objetos em Imagens
+## Estrutura do Modelo
 
-## Descrição do Projeto
+```python
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
 
-Este projeto implementa um modelo de reconhecimento de objetos em imagens utilizando PyTorch. O modelo foi treinado utilizando a arquitetura ResNet-18 pré-treinada e ajustada para classificar imagens de formigas e abelhas. Uma API em Flask foi criada para receber imagens e retornar a categoria inferida pelo modelo.
+# Carregando os dados CIFAR-10
+(train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
 
-## Como Executar
+# Normalizando os valores dos pixels
+train_images, test_images = train_images / 255.0, test_images / 255.0
 
-### Requisitos
+# Definindo a arquitetura do modelo
+model = models.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(128, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Flatten(),
+    layers.Dense(128, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(10)
+])
 
-- Python 3.7+
-- Flask
-- PyTorch
-- Torchvision
-- PIL
-- Requests
+# Compilando o modelo
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
 
-### Passos
+# Treinando o modelo
+model.fit(train_images, train_labels, epochs=5,
+          validation_data=(test_images, test_labels))
 
-1. Clone o repositório:
-   ```sh
-   git clone https://github.com/seu_usuario/seu_repositorio.git
-Navegue até o diretório do projeto:
-sh
-Copy code
-cd seu_repositorio
-Instale as dependências:
-sh
-Copy code
-pip install -r requirements.txt
-Execute o script para treinar o modelo e criar a API:
-sh
-Copy code
-python implementacao_completa.py
-Uso da API
-Para usar a API, envie uma solicitação POST para o endpoint /predict com uma imagem. Aqui está um exemplo utilizando curl:
+# Salvando o modelo treinado
+model.save('cifar10_cnn_model.h5')
 
-curl -X POST -F "file=@caminho/para/sua/imagem.jpg" http://127.0.0.1:5000/predict
+```
+
+A ideia foi disponibilizar o modelo via API, para isso utilizei o Insomnia para teste, utilizei algumas imagens para ver como o modelo respondia:
+
+## Testes na API
+
+A ideia foi passar na requisição através da seguinte URL. Que no caso, é a URL pública disponibilizada pelo ngrok acompanhada pelo ```/predict```.
+
+ ```https://0ea3-34-126-173-164.ngrok-free.app/predict```
+
+### Imagens Originais e Resultados dos Testes
+
+### Caminhão
+![Descrição da Imagem](./imagens/caminhao.jpg)
+
+![Descrição da Imagem](./testes/teste_caminhao.png)
+
+### Sapo
+![Descrição da Imagem](./imagens/sapo.jpg)
+![Descrição da Imagem](./testes/teste_sapo.png)
+
+### Cavalo
+![Descrição da Imagem](./imagens/cavalo.jpg)
 
 
-### Resultados dos Testes
+![Descrição da Imagem](./testes/teste_cavalo.png)
 
-#### Caso de Teste 1
-- **Imagem:** formiga1.jpg
-- **Resultado Esperado:** Formiga
-- **Resultado Obtido:** Formiga
 
-#### Caso de Teste 2
-- **Imagem:** abelha1.jpg
-- **Resultado Esperado:** Abelha
-- **Resultado Obtido:** Abelha
 
-#### Caso de Teste 3
-- **Imagem:** formiga2.jpg
-- **Resultado Esperado:** Formiga
-- **Resultado Obtido:** Formiga
